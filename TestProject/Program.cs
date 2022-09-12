@@ -6,6 +6,7 @@ using TestProject.DataLoaders;
 using TestProject.Nodes;
 using TestProject.Queries;
 using TestProject.Repositories;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,14 +16,13 @@ builder.Services.AddControllers();
 builder.Services.AddPooledDbContextFactory<TestDbContext>(options 
     => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TestCatalog;Integrated Security=True;"));
 
-builder.Services.AddTransient(_ => new SubscriptionOfferSheetRepository(_.GetRequiredService<IDbContextFactory<TestDbContext>>().CreateDbContext()));
-builder.Services.AddTransient(_ => new PromotionLineRepository(_.GetRequiredService<IDbContextFactory<TestDbContext>>().CreateDbContext()));
+builder.Services.AddTransient<SubscriptionOfferSheetRepository>();
+builder.Services.AddTransient<PromotionLineRepository>();
 
 builder.Services
     .AddMemoryCache()
     .AddGraphQLServerCore()
     .AddGraphQL()
-    .AddHttpRequestInterceptor<DefaultHttpRequestInterceptor>()
     .AddQueryType()
         .AddTypeExtension<PromotionLineQueries>()
         .AddTypeExtension<SubscriptionOfferSheetQueries>()
@@ -32,7 +32,16 @@ builder.Services
     .AddDataLoader<PromotionLineByIdDataLoader>()
     .AddFiltering()
     .AddSorting()
-    .AddGlobalObjectIdentification();
+    .AddGlobalObjectIdentification()
+    .AddHttpRequestInterceptor<DefaultHttpRequestInterceptor>()
+    .AddIdSerializer(true)
+    .PublishSchemaDefinition(c => c
+                    .SetName("testschema")
+                    .IgnoreRootTypes()
+                    .AddTypeExtensionsFromFile("./Stitching.graphql")); ;
+
+//builder.Services.RemoveAll<IIdSerializer>();
+//builder.Services.AddSingleton<IIdSerializer>(new IdSerializer(includeSchemaName: true));
 
 var app = builder.Build();
 

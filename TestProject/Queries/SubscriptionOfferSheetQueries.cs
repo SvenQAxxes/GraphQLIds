@@ -15,7 +15,8 @@ namespace TestProject.Queries
             [Service] SubscriptionOfferSheetRepository subscriptionOfferSheetRepository,
             CancellationToken cancellationToken)
         {
-            return subscriptionOfferSheetRepository.GetAllSubscriptionOfferSheets();
+            var result = subscriptionOfferSheetRepository.GetAllSubscriptionOfferSheets();
+            return result;
         }
     }
 }
