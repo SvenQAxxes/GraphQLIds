@@ -1,20 +1,15 @@
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
-using Microsoft.EntityFrameworkCore;
-using TestProject;
 using TestProject.DataLoaders;
 using TestProject.Nodes;
 using TestProject.Queries;
 using TestProject.Repositories;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddPooledDbContextFactory<TestDbContext>(options 
-    => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=TestCatalog;Integrated Security=True;"));
 
 builder.Services.AddTransient<SubscriptionOfferSheetRepository>();
 builder.Services.AddTransient<PromotionLineRepository>();
